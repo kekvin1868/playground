@@ -1,2 +1,2 @@
 # playground
-All tutorials &amp; learning projects.
+all tutorial languages, modules &amp; learning projects.
