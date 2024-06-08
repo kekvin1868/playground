@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('talent_skill', function (Blueprint $table) {
-
-            $table->bigIncrements('talent_skill_id');
+        Schema::create('rl_talents_skills', function (Blueprint $table) {
+            $table->bigIncrements('id_talent_skills');
             $table->enum('talent_skill_status', [0, 1])->default(0);
             $table->timestamp('talent_skill_created_timestamp')->useCurrent();
             $table->timestamp('talent_skill_updated_timestamp')->useCurrent()->useCurrentOnUpdate();
@@ -23,8 +22,8 @@ return new class extends Migration
             $table->float('talent_skill_score');
 
             // Foreign key constraints
-            $table->foreign('talent_id')->references('talent_id')->on('talent')->onDelete('cascade');
-            $table->foreign('skill_id')->references('id')->on('master_skill')->onDelete('cascade');
+            $table->foreign('talent_id')->references('id_talent')->on('dt_talents')->onDelete('cascade');
+            $table->foreign('skill_id')->references('id_skill')->on('ms_skills')->onDelete('cascade');
         });
     }
 
@@ -33,8 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('talent_skill');
+        Schema::dropIfExists('rl_talents_skills');
     }
 };
-
-//master_role

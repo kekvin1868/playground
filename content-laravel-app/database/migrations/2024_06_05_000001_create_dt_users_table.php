@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->bigIncrements('user_id');
+        Schema::create('dt_users', function (Blueprint $table) {
+            $table->bigIncrements('id_user');
             $table->enum('user_status', [0, 1])->default(0);
             $table->timestamp('user_created_timestamp')->useCurrent();
             $table->timestamp('user_updated_timestamp')->useCurrent()->useCurrentOnUpdate();
@@ -29,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('dt_users');
     }
 };
 

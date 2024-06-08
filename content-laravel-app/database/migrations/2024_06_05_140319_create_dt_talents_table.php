@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('talent', function (Blueprint $table) {
-            $table->bigIncrements('talent_id');
+        Schema::create('dt_talents', function (Blueprint $table) {
+            $table->bigIncrements('id_talent');
             $table->enum('talent_status', [0, 1])->default(0);
             $table->timestamp('talent_created_timestamp')->useCurrent();
             $table->timestamp('talent_updated_timestamp')->useCurrent()->useCurrentOnUpdate();
             $table->unsignedBigInteger('user_id');
             $table->float('talent_score');
 
-            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id_user')->on('dt_users')->onDelete('cascade');
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('talent');
+        Schema::dropIfExists('dt_talents');
     }
 };
