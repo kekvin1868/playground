@@ -12,28 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
+            $table->bigIncrements('user_id');
+            $table->enum('user_status', [0, 1])->default(0);
+            $table->timestamp('user_created_timestamp')->useCurrent();
+            $table->timestamp('user_updated_timestamp')->useCurrent()->useCurrentOnUpdate();
+            $table->string('user_mail')->unique();
+            $table->string('user_pass');
+            $table->string('user_fullname');
+            $table->enum('user_agree_to_ToS', [0, 1])->default(0);
+            $table->enum('user_agree_to_PP', [0, 1])->default(0);
         });
     }
 
@@ -43,7 +30,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
     }
 };
+
+//update
