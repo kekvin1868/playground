@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\DtTalentController;
 use Illuminate\Http\Request;
 use App\Models\DataTalent;
 

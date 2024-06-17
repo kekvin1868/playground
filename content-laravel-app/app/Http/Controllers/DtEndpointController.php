@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\DtEndpointController;
 use App\Models\DataEndpoint;
 use App\Models\DataApp;
 use Illuminate\Http\Request;
 
-class DtEndpointsController extends Controller
+class DtEndpointController extends Controller
 {
     public function index()
     {
-        $endpoints = DataEndpoint::with('foreignAppId')->get();
-        return response()->json($endpoints);
+        $eps = DataEndpoint::with('foreignAppId')->get();
+        return response()->json($eps);
     }
 
     public function store(Request $request)

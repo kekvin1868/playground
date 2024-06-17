@@ -11,20 +11,25 @@ class DtAppController extends Controller
     public function index()
     {
         $applications = DataApp::all();
-        return response()->json($applications);
+        return response()->json([
+            'apps' => $applications,
+            'token' => csrf_token(),
+        ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'app_status' => 'required|in:0,1',
-        ]);
+        // More viable when the user key is up.
+        // $request->validate([
+        //     'app_status' => 'required|in:0,1',
+        // ]);
 
-        $genKey = Str::random(32);
+        $genKey = Str::uuid();
 
         $newApp = DataApp::create([
-            'app_key' => $appKey,
-            'app_status' => $request->app_status,
+            'app_key' => $genKey,
+            'app_status' => 1,
+            // 'app_status' => $request->app_status,
         ]);
 
         return response()->json(['success' => 'Application created successfully.', 'application' => $newApp]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\DtUserController;
 use App\Models\DataUser;
 use Illuminate\Http\Request;
 
@@ -13,16 +14,26 @@ class DtUserController extends Controller
         return response()->json($users);
     }
 
-    public function register(Request $request)
+    public function store(Request $request)
     {
-        $request->validate([
-            'user_status' => 'required|in:0,1',
-            'user_mail' => 'required|email|unique:users,user_mail',
-            'user_pass' => 'required|string|min:8',
-            'user_fullname' => 'required|string|max:255',
-            'user_agree_to_ToS' => 'required|in:0,1',
-            'user_agree_to_PP' => 'required|in:0,1',
+        $request->merge([
+            'user_status' => 1,
         ]);
+
+        try {
+            $request->validate([
+                'user_status' => 'required|in:0,1',
+                'user_mail' => 'required|email|unique:dt_users,user_mail',
+                'user_pass' => 'required|string|min:8',
+                'user_fullname' => 'required|string|max:255',
+                'user_agree_to_ToS' => 'required|in:0,1',
+                'user_agree_to_PP' => 'required|in:0,1',
+            ], [
+                'user_pass.min' => 'The password must be at least 8 characters long.',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['error' => $e->errors()], 422);
+        }
 
         $newUser = DataUser::create($request->all());
 
