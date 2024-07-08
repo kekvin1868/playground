@@ -11,10 +11,7 @@ class DtAppController extends Controller
     public function index()
     {
         $applications = DataApp::all();
-        return response()->json([
-            'apps' => $applications,
-            'token' => csrf_token(),
-        ]);
+        return response()->json($applications);
     }
 
     public function store(Request $request)
@@ -57,5 +54,11 @@ class DtAppController extends Controller
         $dropApp->delete();
 
         return response()->json(['success' => 'Application deleted successfully.']);
+    }
+
+    public function getCsrfToken() {
+        return response()->json([
+            'csrf' => csrf_token(),
+        ]);
     }
 }

@@ -28,5 +28,20 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.googleusercontent.apps.720824865533-ngkem20soveio309i9gljicuddhrrfp1</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.720824865533-ngkem20soveio309i9gljicuddhrrfp1</string>
+			</array>
+		</dict>
+	</array>
+	<key>GoogleSignInClientID</key>
+	<string>720824865533-ngkem20soveio309i9gljicuddhrrfp1.apps.googleusercontent.com</string>
 </dict>
 </plist>

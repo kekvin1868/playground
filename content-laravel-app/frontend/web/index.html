@@ -29,8 +29,27 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>frontend</title>
+  <title>TalentPool</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- GStatic & Firebase -->
+  <meta name="google-signin-client_id" content="720824865533-g5milmnhd4d7kos8k8fgg40b652cs771">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyCRO_4KYBpo0eivBCCBeJNtQN405yPD9Ws",
+      authDomain: "talent-pool-82df8.firebaseapp.com",
+      projectId: "talent-pool-82df8",
+      storageBucket: "talent-pool-82df8.appspot.com",
+      messagingSenderId: "720824865533",
+      appId: "1:720824865533:web:429a8e6ded95d1e1b7e494",
+      measurementId: "G-HKLW2GFZRM"
+    }
+
+    firebase.initializeApp(firebaseConfig);
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

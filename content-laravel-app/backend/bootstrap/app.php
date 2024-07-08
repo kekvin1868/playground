@@ -11,7 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->validateCsrfTokens(except: [
+            'http://localhost:8000/api/check-email*',
+            'http://localhost:8000/api/activation*',
+            'http://localhost:8000/users*',
+            'http://localhost:8000/uuid',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

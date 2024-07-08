@@ -12,17 +12,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-/*
-    TODO:
-        - Remove VerifyCsrfToken exception.
-        - Only when Frontend is implemented, CSRF can be passed.
-*/
-
 Route::middleware(['check.api.key'])->group(function () {
-    // Session Data
+    // User Calls
     Route::resource('users', DtUserController::class);
-    Route::resource('apps', DtAppController::class);
-    Route::resource('endpoints', DtEndpointController::class);
-});
 
+    // App Calls
+    Route::resource('apps', DtAppController::class);
+
+    // Endpoint Calls
+    Route::resource('endpoints', DtEndpointController::class);
+
+    // Sign-In Calls
+    Route::get('get-csrf', [DtAppController::class, 'getCsrfToken']);
+});
 ?>
