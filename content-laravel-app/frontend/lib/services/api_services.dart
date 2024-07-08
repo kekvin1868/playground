@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:frontend/models/ms_skill.dart';
 
 class ApiService {
   static const String baseUrl = 'https://backend.pakar.diawan.id/api';
-  static const String webUrl = 'https://backend.pakar.diawan.id';
+  static const String webUrl = 'http://localhost:8000';
+  // static const String webUrl = 'https://backend.pakar.diawan.id';
 
   Future<List<Skill>> fetchSkills() async {
     final res = await http.get(
@@ -53,7 +55,7 @@ class ApiService {
     }
   }
 
-  Future<void> updateUser(int id, String uuid) async {
+  Future<void> updateUserActivation(int id, String uuid) async {
     try {
       final res = await http.put(
         Uri.parse('$webUrl/users/$id?type=activation'),
@@ -95,10 +97,34 @@ class ApiService {
     }
   }
 
+  Future<void> updateUserIdentity(int userId, String idNum, String bnkNum, String taxNum, File? image) async {
+    try {
+      final res = await http.put(
+        Uri.parse('$webUrl/users/$userId?type=personal'),
+        headers: {
+          'x-api-key': 'test',
+          'ktp': idNum,
+          'bank': bnkNum,
+          'npwp': taxNum,
+        }
+      );
+
+      if (res.statusCode == 200) {
+        print('Identity Record updated. User $userId');
+      } else {
+        print('Identity Record for user update failed. User $userId');
+        print(res.statusCode);
+      }
+    } catch (e) {
+      final message = e.toString();
+      print(message);
+    }
+  }
+
   Future<Map<String, dynamic>> checkUser(String? email) async {
     try {
       final res = await http.post(
-        Uri.parse('$baseUrl/api/check-email'),
+        Uri.parse('$baseUrl/check-email'),
         headers: <String, String> {
           'Content-Type': 'application/json; charset=UTF-8',
           'x-api-key': 'test',

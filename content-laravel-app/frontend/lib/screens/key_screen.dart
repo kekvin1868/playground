@@ -120,7 +120,7 @@ class _KeyScreenState extends State<KeyScreen> {
     final bool validation = await ApiService().validateUuid(uuid);
 
     if (validation) {
-      await ApiService().updateUser(userId, uuid);
+      await ApiService().updateUserActivation(userId, uuid);
       if (mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.pushReplacementNamed(

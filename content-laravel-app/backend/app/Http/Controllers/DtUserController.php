@@ -58,6 +58,10 @@ class DtUserController extends Controller
                 'user_status' => '0',
                 'user_agree_to_ToS' => '0',
                 'user_agree_to_PP' => '0',
+                'user_ktp_image' => '',
+                'user_photo_image' => '',
+                'user_npwp_number' => '',
+                'user_bank_number' => '',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['error' => $e->errors()], 422);
@@ -97,6 +101,7 @@ class DtUserController extends Controller
         if ($request->input('type') === 'personal') {
             $user = DataUser::where('id_user', $info)->firstOrFail();
 
+            $userPicture = $request->header('id');
             $user->
             $user->save();
 

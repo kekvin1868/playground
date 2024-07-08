@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:platform/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/globals.dart';
 import 'package:frontend/screens/treemap_screen.dart';
@@ -18,6 +21,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String? uuid;
   int? id;
   bool _dialogShown = false;
+
+  // Picture Files
+  File? _image;
+  String? _fileName;
+  final ImagePicker _picker = ImagePicker();
+  final LocalPlatform _platform = LocalPlatform();
 
   @override
   void didChangeDependencies() {
@@ -109,9 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               child: const Text('Agree'),
               onPressed: () {
-                _updateUser(id!, uuid);
+                _submitUpdateAgreements(id!, uuid);
                 Navigator.of(context).pop();
-                _showIdentityDialog();
+                _showIdentityDialog(id!);
               },
             ),
           ],
@@ -120,16 +129,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _updateUser(int id, String? uuid) async {
+  Future<void> _submitUpdateAgreements(int id, String? uuid) async {
     await ApiService().updateAgreementUser(id, uuid!);
-    if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacementNamed(
-          context,
-          '/treemap'
-        );
-      });
-    }
+    // if (mounted) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     Navigator.pushReplacementNamed(
+    //       context,
+    //       '/treemap'
+    //     );
+    //   });
+    // }
   }
 
   Future<void> _checkUserAgreementsAndNavigate(int id) async {
@@ -158,6 +167,139 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Error checking user agreements: $e');
     }
+  }
+
+  void _showIdentityDialog(int id) {
+    final TextEditingController identityCardController = TextEditingController();
+    final TextEditingController bankAccountController = TextEditingController();
+    final TextEditingController npwpNumberController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              backgroundColor: const Color.fromARGB(255, 25, 25, 25),
+              title: const Text('Enter your details'),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const Text('Upload your Picture', style: TextStyle(color: Colors.white)),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.add_a_photo, color: Colors.white),
+                          onPressed: () async {
+                            if(_platform.isAndroid || _platform.isIOS) {
+                              final pickedFileAnd = await _picker.pickImage(source: ImageSource.gallery);
+
+                              if (pickedFileAnd != null) {
+                                setState(() {
+                                  _image = File(pickedFileAnd.path);
+                                  _fileName = pickedFileAnd.name;
+                                });
+                              } else {
+                                if (mounted) {
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('No image selected.'),
+                                      ),
+                                    );
+                                  });
+                                }
+                              }
+                            } else {
+                              FilePickerResult? pickedFileDskt = await FilePicker.platform.pickFiles(type: FileType.image);
+                              
+                              if (pickedFileDskt != null && pickedFileDskt.files.single.path != null) {
+                                setState(() {
+                                  _image = File(pickedFileDskt.files.single.path!);
+                                  _fileName = pickedFileDskt.files.single.name;
+                                });
+                              } else {
+                                if (mounted) {
+                                  print('file upload something wrong.');
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('No image selected.'),
+                                      ),
+                                    );
+                                  });
+                                }
+                              }
+                            }
+                          },
+                        ),
+                        if (_fileName != null)
+                          Text(_fileName!, style: const TextStyle(color: Colors.white),),
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
+                    const Text('Bank Account Number'),
+                    const SizedBox(height: 8.0),
+                    TextField(
+                      controller: bankAccountController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your bank account number',
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    const Text('Identity Card Number (KTP)'),
+                    const SizedBox(height: 8.0),
+                    TextField(
+                      controller: identityCardController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter your identity card number',
+                      ),
+                    ),
+                    const SizedBox(height: 16.0,),
+                    const Text('NPWP Number'),
+                    const SizedBox(height: 8.0),
+                    TextField(
+                      controller: npwpNumberController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter NPWP Number',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Submit'),
+                  onPressed: () {
+                    // Handle the submission of the details
+                    final identityCardNumber = identityCardController.text;
+                    final bankAccountNumber = bankAccountController.text;
+                    final npwpNumber = npwpNumberController.text;
+
+                    // Perform your API call or other actions with the data here
+                    _submitDetails(id, identityCardNumber, npwpNumber, bankAccountNumber, _image);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _submitDetails(int id, String identityCardNumber, String bankAccountNumber, String npwpNumber, File? image) {
+    // Implement your logic to handle the submitted details here
+    // await ApiService().updateUserIdentity(userId, identityCardNumber, npwpNumber, bankAccountNumber, image);
+    print('User ID: $id');
+    print('Image: ${image?.path}');
+    print('file name: ${_fileName}');
+    print('Identity Card Number: $identityCardNumber');
+    print('Bank Account Number: $bankAccountNumber');
+    print('NPWP No.: $npwpNumber');
   }
 
   void showErrorSnackBar(String message) {

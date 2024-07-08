@@ -43,5 +43,11 @@
 	</array>
 	<key>GoogleSignInClientID</key>
 	<string>720824865533-ngkem20soveio309i9gljicuddhrrfp1.apps.googleusercontent.com</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to your microphone</string>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to your camera</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library</string>
 </dict>
 </plist>
