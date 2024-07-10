@@ -41,36 +41,48 @@ class DtUserController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'user_mail' => 'required|email|unique:dt_users,user_mail',
-                'user_pass' => 'required|string|min:8',
-                'user_fullname' => 'required|string|max:255',
-                'user_agree_to_ToS' => 'required|in:0,1',
-                'user_agree_to_PP' => 'required|in:0,1',
-            ], [
-                'user_pass.min' => 'The password must be at least 8 characters long.',
-            ]);
+        if ($request->input('type') === 'getAgreements') {
+            $id = $request->get('id');
 
-            $request->merge([
-                'user_pass' => Hash::make($request->user_pass),
-            ]);
+            $user = DataUser::where('id_user', $id)->firstOrFail();
 
-            $request->merge([
-                'user_status' => '0',
-                'user_agree_to_ToS' => '0',
-                'user_agree_to_PP' => '0',
-                'user_ktp_image' => '',
-                'user_photo_image' => '',
-                'user_npwp_number' => '',
-                'user_bank_number' => '',
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json(['error' => $e->errors()], 422);
-        } finally {
-            $newUser = DataUser::create($request->all());
+            if ($user->user_agree_to_ToS === true && $user->user_agree_to_PP === true) {
+                return response()->true;
+            } else {
+                return response()->false;
+            }
+        } else {
+            try {
+                $request->validate([
+                    'user_mail' => 'required|email|unique:dt_users,user_mail',
+                    'user_pass' => 'required|string|min:8',
+                    'user_fullname' => 'required|string|max:255',
+                    'user_agree_to_ToS' => 'required|in:0,1',
+                    'user_agree_to_PP' => 'required|in:0,1',
+                ], [
+                    'user_pass.min' => 'The password must be at least 8 characters long.',
+                ]);
 
-            return response()->json(['success' => 'User created successfully.', 'user' => $newUser], 201);
+                $request->merge([
+                    'user_pass' => Hash::make($request->user_pass),
+                ]);
+
+                $request->merge([
+                    'user_status' => '0',
+                    'user_agree_to_ToS' => '0',
+                    'user_agree_to_PP' => '0',
+                    'user_ktp_image' => '',
+                    'user_photo_image' => '',
+                    'user_npwp_number' => '',
+                    'user_bank_number' => '',
+                ]);
+            } catch (ValidationException $e) {
+                return response()->json(['error' => $e->errors()], 422);
+            } finally {
+                $newUser = DataUser::create($request->all());
+
+                return response()->json(['success' => 'User created successfully.', 'user' => $newUser], 201);
+            }
         }
     }
 
@@ -152,7 +164,6 @@ class DtUserController extends Controller
 
     public function checkEmailUser(Request $request) {
         $email = $request->get('email');
-        Log::info($email);
 
         $user = DataUser::where('user_mail', $email)->first();
 

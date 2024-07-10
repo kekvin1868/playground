@@ -184,19 +184,16 @@ class ApiService {
 
   Future<bool> checkUserAgreements(int currentUser) async {
     try {
-      final res = await http.get(
-        Uri.parse('$webUrl/users?getAgreements'),
+      final res = await http.post(
+        Uri.parse('$webUrl/users?type=getAgreements'),
         headers: <String, String> {
           'Content-Type': 'application/json;',
           'x-api-key': 'test',
+        },
+        body: {
           'id': '$currentUser',
         },
-        // body: jsonEncode(<String, dynamic> {
-          
-        // }
-        // ),
       );
-      await Future.delayed(const Duration(seconds: 1));
 
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
