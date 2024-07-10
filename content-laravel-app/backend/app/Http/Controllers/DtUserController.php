@@ -151,23 +151,20 @@ class DtUserController extends Controller
     }
 
     public function checkEmailUser(Request $request) {
-        $email = $request->header('email');
+        $email = $request->get('email');
+        Log::info($email);
 
         $user = DataUser::where('user_mail', $email)->first();
 
         if ($user) {
             return response()->json([
                 'exists' => true,
-                'unique_id' => $user->unique_id,
-                'status' => $user->user_status,
-                'id' => $user->id_user,
+                'user_info' => $user,
             ]);
         } else {
             return response()->json([
                 'exists' => false,
-                'unique_id' => null,
-                'status' => $user->user_status,
-                'id' => $user->id_user,
+                'user_info' => null,
             ]);
         }
     }

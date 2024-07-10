@@ -16,7 +16,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final AuthService _authService = AuthService();
   bool _isLoading = false;
 
   @override
@@ -92,36 +91,26 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<int> _returnUserId (String u) async {
-    final int temp = await ApiService().getUserId(u);
-
-    return temp;
-  }
-
   void _signInWithGoogle() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      User? googleUser = await _authService.signInWithGoogle();
+      User? googleUser = await AuthService().signInWithGoogle();
 
       if (googleUser != null && mounted) {
         final Map<String, dynamic> checkResult = await ApiService().checkUser(googleUser.email);
-        final bool emailCheck = checkResult['exists'] as bool;
-        final String uuid = checkResult['unique_id'] as String;
-        final String userStatus = checkResult['status'] as String;
-        int id = await _returnUserId(uuid);
 
-        emailCheck 
-          ? userStatus == '0'
+        checkResult['exists']
+          ? checkResult['status'] == '0'
             ? Navigator.pushReplacementNamed(
                 context,
                 '/key', 
                 arguments: {
                   'user': googleUser,
-                  'uuid': uuid,
-                  'id': id,
+                  'uuid': checkResult['unique_id'],
+                  'id': checkResult['id'],
                 }
               )
             : Navigator.pushReplacementNamed(
@@ -129,8 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 '/home',
                 arguments: {
                   'user': googleUser,
-                  'uuid': uuid,
-                  'id': id,
+                  'uuid': checkResult['unique_id'],
+                  'id': checkResult['id'],
                 }
               )
           : _showCareerPageDialog(context);
@@ -196,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     ).then((_) {
-      _authService.signOut(context);
+      AuthService().signOut(context);
     });
   }
 
