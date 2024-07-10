@@ -28,10 +28,8 @@ class _KeyScreenState extends State<KeyScreen> {
     uuid = args['uuid'] as String;
     id = args['id'] as int;
 
-    _sendEmailOnce(uuid, user?.email);
+    // _sendEmailOnce(uuid, user?.email);
   }
-
-  
 
   @override
   Widget build(BuildContext context) {

@@ -25,8 +25,10 @@ class _HomeScreenState extends State<HomeScreen> {
   // Picture Files
   File? _image;
   String? _fileName;
+  File? _ktpImage;
+  String? _ktpFileName;
   final ImagePicker _picker = ImagePicker();
-  final LocalPlatform _platform = LocalPlatform();
+  final LocalPlatform _platform = const LocalPlatform();
 
   @override
   void didChangeDependencies() {
@@ -82,6 +84,34 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _checkUserAgreementsAndNavigate(int id) async {
+    try {
+      bool agreementsAccepted = await ApiService().checkUserAgreements(id);
+
+      if (agreementsAccepted) {
+        // Directly navigate to TreemapScreen
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const TreemapScreen(title: 'Your Title')),
+            );
+          });
+        }
+      } else {
+        // Show dialog if not already shown
+        if (!_dialogShown) {
+          _dialogShown = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showTermsDialog(uuid);
+          });
+        }
+      }
+    } catch (e) {
+      print('Error checking user agreements: $e');
+    }
+  }
+
   void _showTermsDialog(String? uuid) {
     showDialog(
       context: context,
@@ -130,42 +160,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _submitUpdateAgreements(int id, String? uuid) async {
-    await ApiService().updateAgreementUser(id, uuid!);
-    // if (mounted) {
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     Navigator.pushReplacementNamed(
-    //       context,
-    //       '/treemap'
-    //     );
-    //   });
-    // }
-  }
-
-  Future<void> _checkUserAgreementsAndNavigate(int id) async {
     try {
-      bool agreementsAccepted = await ApiService().checkUserAgreements(id);
-
-      if (agreementsAccepted) {
-        // Directly navigate to TreemapScreen
-        if (mounted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const TreemapScreen(title: 'Your Title')),
-            );
-          });
-        }
-      } else {
-        // Show dialog if not already shown
-        if (!_dialogShown) {
-          _dialogShown = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _showTermsDialog(uuid);
-          });
-        }
-      }
+      await ApiService().updateAgreementUser(id, uuid!);
     } catch (e) {
-      print('Error checking user agreements: $e');
+      final message = e.toString();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+          ),
+        );
+      }
     }
   }
 
@@ -187,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Text('Upload your Picture', style: TextStyle(color: Colors.white)),
+                    const Text('Upload Your Picture', style: TextStyle(color: Colors.white)),
                     Row(
                       children: [
                         IconButton(
@@ -203,13 +208,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 });
                               } else {
                                 if (mounted) {
-                                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('No image selected.'),
-                                      ),
-                                    );
-                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('No image selected.'),
+                                    ),
+                                  );
                                 }
                               }
                             } else {
@@ -222,14 +225,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 });
                               } else {
                                 if (mounted) {
-                                  print('file upload something wrong.');
-                                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('No image selected.'),
-                                      ),
-                                    );
-                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('No image selected.'),
+                                    ),
+                                  );
                                 }
                               }
                             }
@@ -239,13 +239,63 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(_fileName!, style: const TextStyle(color: Colors.white),),
                       ],
                     ),
+                    const SizedBox(height: 16.0), 
+                    const Text('Upload KTP', style: TextStyle(color: Colors.white)), // Upload KTP
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.add_a_photo, color: Colors.white),
+                          onPressed: () async {
+                            if(_platform.isAndroid || _platform.isIOS) {
+                              final pickedFileAnd = await _picker.pickImage(source: ImageSource.gallery);
+
+                              if (pickedFileAnd != null) {
+                                setState(() {
+                                  _ktpImage = File(pickedFileAnd.path);
+                                  _ktpFileName = pickedFileAnd.name;
+                                });
+                              } else {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('No image selected.'),
+                                    ),
+                                  );
+                                }
+                              }
+                            } else {
+                              FilePickerResult? pickedFileDskt = await FilePicker.platform.pickFiles(type: FileType.image);
+                              
+                              if (pickedFileDskt != null && pickedFileDskt.files.single.path != null) {
+                                setState(() {
+                                  _ktpImage = File(pickedFileDskt.files.single.path!);
+                                  _ktpFileName = pickedFileDskt.files.single.name;
+                                });
+                              } else {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('No image selected.'),
+                                    ),
+                                  );
+                                }
+                              }
+                            }
+                          },
+                        ),
+                        if (_ktpFileName != null)
+                          Text(_ktpFileName!, style: const TextStyle(color: Colors.white),),
+                      ],
+                    ),
                     const SizedBox(height: 16.0),
                     const Text('Bank Account Number'),
                     const SizedBox(height: 8.0),
                     TextField(
                       controller: bankAccountController,
+                      style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         hintText: 'Enter your bank account number',
+                        hintStyle: TextStyle(color: Colors.white70),
                       ),
                     ),
                     const SizedBox(height: 16.0),
@@ -253,8 +303,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 8.0),
                     TextField(
                       controller: identityCardController,
+                      style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         hintText: 'Enter your identity card number',
+                        hintStyle: TextStyle(color: Colors.white70),
                       ),
                     ),
                     const SizedBox(height: 16.0,),
@@ -262,8 +314,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 8.0),
                     TextField(
                       controller: npwpNumberController,
+                      style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         hintText: 'Enter NPWP Number',
+                        hintStyle: TextStyle(color: Colors.white70),
                       ),
                     ),
                   ],
@@ -272,14 +326,14 @@ class _HomeScreenState extends State<HomeScreen> {
               actions: <Widget>[
                 TextButton(
                   child: const Text('Submit'),
-                  onPressed: () {
+                  onPressed: () async {
                     // Handle the submission of the details
                     final identityCardNumber = identityCardController.text;
                     final bankAccountNumber = bankAccountController.text;
                     final npwpNumber = npwpNumberController.text;
 
                     // Perform your API call or other actions with the data here
-                    _submitDetails(id, identityCardNumber, npwpNumber, bankAccountNumber, _image);
+                    _submitDetails(id, identityCardNumber, npwpNumber, bankAccountNumber, _image, _ktpImage);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -291,15 +345,19 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _submitDetails(int id, String identityCardNumber, String bankAccountNumber, String npwpNumber, File? image) {
-    // Implement your logic to handle the submitted details here
-    // await ApiService().updateUserIdentity(userId, identityCardNumber, npwpNumber, bankAccountNumber, image);
-    print('User ID: $id');
-    print('Image: ${image?.path}');
-    print('file name: ${_fileName}');
-    print('Identity Card Number: $identityCardNumber');
-    print('Bank Account Number: $bankAccountNumber');
-    print('NPWP No.: $npwpNumber');
+  void _submitDetails(int id, String identityCardNumber, String bankAccountNumber, String npwpNumber, File? image, File? ktpImage) async {
+    try {
+      ApiService().updateUserIdentity(id, identityCardNumber, npwpNumber, bankAccountNumber, image, ktpImage);
+    } catch (e) {
+      final message = e.toString();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+          ),
+        );
+      }
+    }
   }
 
   void showErrorSnackBar(String message) {

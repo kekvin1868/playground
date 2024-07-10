@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 import 'package:frontend/models/ms_skill.dart';
 
 class ApiService {
@@ -86,9 +88,9 @@ class ApiService {
       );
 
       if (res.statusCode == 200) {
-        print('User Updated');
+        print('User agreement status updated');
       } else {
-        print('User update failed.');
+        print('User agreement status update failed.');
         print(res.statusCode);
       }
     } catch (e) {
@@ -97,20 +99,62 @@ class ApiService {
     }
   }
 
-  Future<void> updateUserIdentity(int userId, String idNum, String bnkNum, String taxNum, File? image) async {
+  void updateUserIdentity(int userId, String idNum, String bnkNum, String taxNum, File? image, File? ktpImage) async {
+    // print('Image: ${image?.path}');
+    // print('KTP Image: ${ktpImage?.path}');
+    // print('Identity Card Number: $idNum');
+    // print('Bank Account Number: $bnkNum');
+    // print('NPWP No.: $taxNum');
+
+    File imagePhotoFile = File(image!.path);
+    Uint8List photoBytes = await imagePhotoFile.readAsBytes();
+    String base64StringPhoto = base64.encode(photoBytes);
+    final photoExtension = p.extension(image.path);
+
+    File imageKtpFile = File(ktpImage!.path);
+    Uint8List ktpPhotoBytes = await imageKtpFile.readAsBytes();
+    String base64StringKtpPhoto = base64.encode(ktpPhotoBytes);
+    final ktpPhotoExtension = p.extension(ktpImage.path);
+
+    print(photoExtension.toString());
+    print(ktpPhotoExtension.toString());
+    
     try {
-      final res = await http.put(
-        Uri.parse('$webUrl/users/$userId?type=personal'),
+      final uri = Uri.parse('$webUrl/users/$userId?type=personal');
+
+      final res = await http.put(uri,
         headers: {
           'x-api-key': 'test',
-          'ktp': idNum,
-          'bank': bnkNum,
-          'npwp': taxNum,
+        },
+        body: {
+          "ktp": idNum,
+          "bank": bnkNum,
+          "npwp": taxNum,
+          "image": base64StringPhoto,
+          "imageExt": photoExtension.toString(),
+          "ktpImage": base64StringKtpPhoto,
+          "ktpExt": ktpPhotoExtension.toString()
         }
       );
 
+      // var res = await http.MultipartRequest('PUT', uri)
+      //   ..headers['x-api-key'] = 'test'
+      //   ..fields['ktp'] = idNum
+      //   ..fields['bank'] = bnkNum
+      //   ..fields['npwp'] = taxNum;
+      
+      // if (image != null) {
+      //   res.files.add(await http.MultipartFile.fromPath('image', image.path));
+      // }
+
+      // if (ktpImage != null) {
+      //   res.files.add(await http.MultipartFile.fromPath('ktpImage', ktpImage.path));
+      // }
+
+
       if (res.statusCode == 200) {
         print('Identity Record updated. User $userId');
+        print(res);
       } else {
         print('Identity Record for user update failed. User $userId');
         print(res.statusCode);

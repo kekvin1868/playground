@@ -7,6 +7,8 @@ use App\Models\DataUser;
 use App\Mail\ActivationEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 
@@ -101,14 +103,44 @@ class DtUserController extends Controller
         if ($request->input('type') === 'personal') {
             $user = DataUser::where('id_user', $info)->firstOrFail();
 
-            $userPicture = $request->header('id');
-            $user->
+            if ($request->get('image')) {
+                $photoBase64 = $request->get('image');
+                $extPhoto = $request->get('imageExt');
+                $userPhoto = $this->saveBase64Image($photoBase64, $extPhoto, 'public/images');
+
+                Log::info($userPhoto);
+                $user->user_photo_image = $userPhoto;
+            }
+
+            if ($request->get('ktpImage')) {
+                $ktpBase64 = $request->get('ktpImage');
+                $extKtpPhoto = $request->get('ktpExt');
+                $ktpPhoto = $this->saveBase64Image($ktpBase64, $extKtpPhoto, 'public/images');
+
+                Log::info($ktpPhoto);
+                $user->user_ktp_image = $ktpPhoto;
+            }
+
+            $user->user_npwp_number = $request->get('npwp') ?? $user->user_npwp_number;
+            $user->user_bank_number = $request->get('bank') ?? $user->user_bank_number;
+            $user->user_ktp_number = $request->get('ktp') ?? $user->user_ktp_number;
+
             $user->save();
 
             return response()->json(['success' => 'User personal data saved.', 'user' => $user]);
         }
 
         return response()->json(['error' => 'Invalid request type.'], 400);
+    }
+
+    // Private Conversion File
+    private function saveBase64Image($base64String, $extension, $path)
+    {
+        $fileName = uniqid() . $extension;
+        $fileData = base64_decode($base64String);
+        $filePath = Storage::put("$path/$fileName", $fileData);
+
+        return $filePath;
     }
 
     public function destroy(DataUser $dropUser)
