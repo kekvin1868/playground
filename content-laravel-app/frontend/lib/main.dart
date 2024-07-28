@@ -85,6 +85,12 @@ class MyApp extends StatelessWidget {
             borderSide: BorderSide(color: Colors.red), // Color of the border when error occurs and focused
           ),
         ),
+        primarySwatch: Colors.blue,
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color.fromARGB(255, 61, 61, 61),
+          selectedItemColor: Color.fromARGB(255, 111, 0, 255),
+          unselectedItemColor: Color.fromARGB(255, 73, 73, 73),
+        ),
       ),
       initialRoute: '/login',
       routes: {
@@ -93,7 +99,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/treemap': (context) => const TreemapScreen(title: 'Talent TreeMap'),
       },
-      // home: const AuthWrapper(),
+      home: const HomeScreen(),
     );
   }
 }

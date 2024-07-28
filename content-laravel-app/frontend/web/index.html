@@ -34,9 +34,19 @@
 
   <!-- GStatic & Firebase -->
   <meta name="google-signin-client_id" content="720824865533-g5milmnhd4d7kos8k8fgg40b652cs771">
-  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://apis.google.com/js/platform.js" async defer onload="start()"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+  <script>
+    function start() {
+      gapi.load('auth2', function() {
+        gapi.auth2.init({
+          client_id:
+            '882483514486-k6nmfd18d0e433219i9o7mnr2rhkl5ne.apps.googleusercontent.com',
+        })
+      });
+    }
+  </script>
   <script>
     var firebaseConfig = {
       apiKey: "AIzaSyCRO_4KYBpo0eivBCCBeJNtQN405yPD9Ws",

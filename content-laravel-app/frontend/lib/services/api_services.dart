@@ -8,7 +8,9 @@ import 'package:frontend/models/ms_skill.dart';
 class ApiService {
   // static const String baseUrl = 'https://backend.pakar.diawan.id/api';
   static const String baseUrl = 'http://localhost:8000/api';
-  static const String webUrl = 'https://backend.pakar.diawan.id';
+
+  // static const String webUrl = 'https://backend.pakar.diawan.id';
+  static const String webUrl = 'http://localhost:8000';
 
   Future<List<Skill>> fetchSkills() async {
     final res = await http.get(
@@ -159,7 +161,7 @@ class ApiService {
         final check = {
           'exists': data['exists'] ?? false,
           'unique_id': data['user_info']['unique_id'] ?? '',
-          'status': data['user_info']['status'] ?? '0',
+          'status': data['user_info']['user_status'] ?? '0',
           'id': data['user_info']['id_user'],
         };
 
@@ -182,28 +184,36 @@ class ApiService {
     }
   }
 
-  Future<bool> checkUserAgreements(int currentUser) async {
+  Future<Object> checkUserAgreements(int currentUser) async {
     try {
       final res = await http.post(
         Uri.parse('$webUrl/users?type=getAgreements'),
-        headers: <String, String> {
-          'Content-Type': 'application/json;',
+        headers: {
           'x-api-key': 'test',
         },
         body: {
           'id': '$currentUser',
-        },
+        }
       );
 
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
-        return data['tos'] == '1' && data['pp'] == '1';
+        return {
+          'tos': data['tos'],
+          'pp': data['pp'],
+        };
       } else {
         final data = jsonDecode(res.body);
-        return data['tos'] == '1' && data['pp'] == '1';
+        return {
+          'tos': data['tos'],
+          'pp': data['pp'],
+        };
       }
     } catch (e) {
-      return false;
+      return {
+          'tos': 0,
+          'pp': 0,
+        };
     }
   }
 }

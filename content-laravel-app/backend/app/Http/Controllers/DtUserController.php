@@ -16,41 +16,21 @@ class DtUserController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->has('getId')) {
-            $uid = $request->header('uuid');
-            $users = DataUser::where('unique_id', $uid)->firstOrFail();
-
-            return response()->json([
-                'id' => $users->id_user,
-            ]);
-        } else if($request->has('getAgreements')) {
-            $stringId = $request->header('id');
-            $id = intval($stringId);
-
-            $users = DataUser::where('id_user', $id)->firstOrFail();
-
-            return response()->json([
-                'tos' => $users->user_agree_to_ToS,
-                'pp' => $users->user_agree_to_PP,
-            ]);
-        } else {
-            $users = DataUser::all();
-            return response()->json($users);
-        }
+        $users = DataUser::all();
+        return response()->json($users);
     }
 
     public function store(Request $request)
     {
         if ($request->input('type') === 'getAgreements') {
-            $id = $request->get('id');
+            $id = intval($request->get('id'));
 
             $user = DataUser::where('id_user', $id)->firstOrFail();
 
-            if ($user->user_agree_to_ToS === true && $user->user_agree_to_PP === true) {
-                return response()->true;
-            } else {
-                return response()->false;
-            }
+            return response()->json([
+                'tos' => $user->user_agree_to_ToS,
+                'pp' => $user->user_agree_to_PP,
+            ]);
         } else {
             try {
                 $request->validate([
@@ -120,7 +100,6 @@ class DtUserController extends Controller
                 $extPhoto = $request->get('imageExt');
                 $userPhoto = $this->saveBase64Image($photoBase64, $extPhoto, 'public/images');
 
-                Log::info($userPhoto);
                 $user->user_photo_image = $userPhoto;
             }
 
@@ -129,7 +108,6 @@ class DtUserController extends Controller
                 $extKtpPhoto = $request->get('ktpExt');
                 $ktpPhoto = $this->saveBase64Image($ktpBase64, $extKtpPhoto, 'public/images');
 
-                Log::info($ktpPhoto);
                 $user->user_ktp_image = $ktpPhoto;
             }
 

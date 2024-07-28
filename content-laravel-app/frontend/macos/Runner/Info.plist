@@ -34,15 +34,15 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.googleusercontent.apps.720824865533-ngkem20soveio309i9gljicuddhrrfp1</string>
+			<string>com.googleusercontent.apps.882483514486-k6nmfd18d0e433219i9o7mnr2rhkl5ne</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.720824865533-ngkem20soveio309i9gljicuddhrrfp1</string>
+				<string>com.googleusercontent.apps.882483514486-k6nmfd18d0e433219i9o7mnr2rhkl5ne</string>
 			</array>
 		</dict>
 	</array>
 	<key>GoogleSignInClientID</key>
-	<string>720824865533-ngkem20soveio309i9gljicuddhrrfp1.apps.googleusercontent.com</string>
+	<string>882483514486-k6nmfd18d0e433219i9o7mnr2rhkl5ne.apps.googleusercontent.com</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need access to your microphone</string>
 	<key>NSCameraUsageDescription</key>

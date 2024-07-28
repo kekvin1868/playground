@@ -7,7 +7,9 @@ import 'dart:convert';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: '882483514486-k6nmfd18d0e433219i9o7mnr2rhkl5ne.apps.googleusercontent.com',
+  );
   static const String webUrl = 'https://backend.pakar.diawan.id';
 
   Future<User?> signInWithGoogle() async {
