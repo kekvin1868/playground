@@ -33,20 +33,6 @@ class DtUserController extends Controller
             ]);
         } else {
             try {
-                $request->validate([
-                    'user_mail' => 'required|email|unique:dt_users,user_mail',
-                    'user_pass' => 'required|string|min:8',
-                    'user_fullname' => 'required|string|max:255',
-                    'user_agree_to_ToS' => 'required|in:0,1',
-                    'user_agree_to_PP' => 'required|in:0,1',
-                ], [
-                    'user_pass.min' => 'The password must be at least 8 characters long.',
-                ]);
-
-                $request->merge([
-                    'user_pass' => Hash::make($request->user_pass),
-                ]);
-
                 $request->merge([
                     'user_status' => '0',
                     'user_agree_to_ToS' => '0',
@@ -55,6 +41,13 @@ class DtUserController extends Controller
                     'user_photo_image' => '',
                     'user_npwp_number' => '',
                     'user_bank_number' => '',
+                ]);
+
+                $request->validate([
+                    'user_mail' => 'required|email|unique:dt_users,user_mail',
+                    'user_fullname' => 'required|string|max:255',
+                    'user_agree_to_ToS' => 'required|in:0,1',
+                    'user_agree_to_PP' => 'required|in:0,1',
                 ]);
             } catch (ValidationException $e) {
                 return response()->json(['error' => $e->errors()], 422);

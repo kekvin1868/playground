@@ -6,11 +6,11 @@ import 'package:path/path.dart' as p;
 import 'package:frontend/models/ms_skill.dart';
 
 class ApiService {
-  // static const String baseUrl = 'https://backend.pakar.diawan.id/api';
-  static const String baseUrl = 'http://localhost:8000/api';
+  static const String baseUrl = 'https://backend.pakar.diawan.id/api';
+  // static const String baseUrl = 'http://localhost:8000/api';
 
-  // static const String webUrl = 'https://backend.pakar.diawan.id';
-  static const String webUrl = 'http://localhost:8000';
+  static const String webUrl = 'https://backend.pakar.diawan.id';
+  // static const String webUrl = 'http://localhost:8000';
 
   Future<List<Skill>> fetchSkills() async {
     final res = await http.get(
